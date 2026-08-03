@@ -51,6 +51,7 @@ export default function Viewer({ record }) {
           cropHealthTilesUrl={record.crop_health_tiles_url}
           activeLayer={activeLayer}
           opacity={opacity}
+          bounds={record.bounds}
         />
 
         <div className="absolute top-4 right-4 z-40 bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 text-white rounded-2xl px-5 py-3 shadow-2xl pointer-events-none">
