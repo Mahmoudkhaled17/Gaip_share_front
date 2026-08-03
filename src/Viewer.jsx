@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ViewerMap from './ViewerMap.jsx';
-import { Wheat, Sprout, Building2, Activity, Percent, User, CalendarDays, Layers } from 'lucide-react';
+import { Wheat, Sprout, Building2, Activity, Percent, User, CalendarDays, Layers, X } from 'lucide-react';
 
 export default function Viewer({ record }) {
   const [activeLayer, setActiveLayer] = useState('crop_type');
   const [opacitySlider, setOpacitySlider] = useState(0.25);
   const [sidebarWidth, setSidebarWidth] = useState(400);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const opacity = 1 - opacitySlider;
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const cropAreas = record.crop_areas_feddans || {};
   const healthAreas = record.crop_health_feddans || {};
@@ -54,24 +62,67 @@ export default function Viewer({ record }) {
           bounds={record.bounds}
         />
 
-        <div className="absolute top-4 right-4 z-40 bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 text-white rounded-2xl px-5 py-3 shadow-2xl pointer-events-none">
+        {isMobile && (
+          <div className="absolute top-0 inset-x-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800/60 flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-black text-slate-100 truncate">{record.Layer_Name}</p>
+                <p className="text-[9px] text-slate-500 font-mono uppercase tracking-widest">GAIP Shared Viewer</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setPanelOpen(true)}
+              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-[11px] font-black shrink-0"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              البيانات والمؤشرات
+            </button>
+          </div>
+        )}
+
+        <div className="absolute top-16 lg:top-4 right-4 z-40 bg-slate-900/90 backdrop-blur-md border border-emerald-500/30 text-white rounded-2xl px-5 py-3 shadow-2xl pointer-events-none">
           <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400 flex items-center gap-2">
             <Layers className="w-3.5 h-3.5" />
             Shared Layer Preview
           </p>
           <p className="text-xs font-bold text-slate-100 mt-1">{record.Layer_Name}</p>
         </div>
+
+        {!panelOpen && (
+          <button
+            onClick={() => setPanelOpen(true)}
+            className="lg:hidden absolute bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-slate-900/95 backdrop-blur-md border border-emerald-500/40 text-slate-100 px-5 py-3 rounded-2xl shadow-2xl text-xs font-black"
+          >
+            <Layers className="w-4 h-4 text-emerald-400" />
+            البيانات والمؤشرات
+          </button>
+        )}
       </div>
 
       <div
-        style={{ width: `${sidebarWidth}px` }}
-        className="border-r border-slate-900 bg-slate-950/90 backdrop-blur-lg h-full flex flex-col shrink-0 text-right overflow-y-auto relative"
+        style={{ width: isMobile ? '100%' : `${sidebarWidth}px` }}
+        className={`border-r border-slate-900 bg-slate-950/90 backdrop-blur-lg h-full flex flex-col shrink-0 text-right overflow-y-auto ${
+          isMobile
+            ? `fixed left-0 top-0 bottom-0 z-50 transition-transform duration-300 ${panelOpen ? 'translate-x-0' : '-translate-x-full'}`
+            : 'relative'
+        }`}
         dir="rtl"
       >
         <div
           onMouseDown={startResize}
-          className="absolute top-0 left-0 w-1.5 h-full cursor-col-resize hover:bg-red-500/50 bg-slate-800 transition-colors z-50"
+          className="absolute top-0 left-0 w-1.5 h-full cursor-col-resize hover:bg-red-500/50 bg-slate-800 transition-colors z-50 hidden lg:block"
         />
+
+        {isMobile && (
+          <button
+            onClick={() => setPanelOpen(false)}
+            className="absolute top-4 left-4 z-50 bg-slate-800 hover:bg-slate-700 text-slate-200 p-2 rounded-xl transition-colors"
+            aria-label="إغلاق"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
 
         <div className="p-6 border-b border-slate-900 bg-slate-950/60">
           <h2 className="text-lg font-black text-slate-100 uppercase tracking-wide mb-1 flex items-center gap-2">

@@ -18,6 +18,17 @@ function FitBounds({ bounds }) {
   return null;
 }
 
+function MapResizer() {
+  const map = useMap();
+
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 150);
+    return () => clearTimeout(t);
+  }, [map]);
+
+  return null;
+}
+
 export default function ViewerMap({
   cropTypeTilesUrl,
   cropHealthTilesUrl,
@@ -53,6 +64,7 @@ export default function ViewerMap({
         />
       )}
       <FitBounds bounds={bounds} />
+      <MapResizer />
     </MapContainer>
   );
 }

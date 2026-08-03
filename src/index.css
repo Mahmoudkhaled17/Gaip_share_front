@@ -11,6 +11,12 @@ html, body, #root {
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
+@supports (height: 100dvh) {
+  html, body, #root {
+    height: 100dvh;
+  }
+}
+
 .leaflet-container {
   width: 100%;
   height: 100%;
